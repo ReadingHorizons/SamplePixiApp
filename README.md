@@ -16,6 +16,10 @@ Phase 1 - Menu:
 
 Phase 2 - Game:
 - Create a "Game" class in the scenes directory. It will be similar to the Menu class.
+- Create the game layout as you'd like, but include the following:
+- Display background image for the game.
+- Display and position the grid for the Xs and Os.
+- Display, position, and resize logo if needed.
 
 Extra Credit:
 
