@@ -9,6 +9,7 @@ export default class TicTacToe {
   private _assetResolution: string;
   private app: Application | undefined;
   private menu: Menu;
+  private game: Game;
   private model: AppModel;
 
   constructor(isHD: boolean = false) {
@@ -37,24 +38,30 @@ export default class TicTacToe {
 
     this.preloadAssets().then(() => {
       //Create the menu
-      const menu = new Menu();
-      menu.create();
-      this.app.stage.addChild(menu);
-
-      function createGame(app: Application) {
-        const game = new Game();
-        game.create();
-        app.stage.addChild(game);
-      }
-
-      if (menu.isDestroyed) {
-        menu.destroy();
-        createGame(this.app);
-      }
+      this.createMenu();
     });
   }
 
-  private createMenu(): void {}
+  private createMenu(): void {
+    this.menu = new Menu();
+    this.menu.addEvtListener("gameStart", () => {
+      console.log("game started");
+      this.destroyMenu();
+      this.createGame();
+    });
+    this.app.stage.addChild(this.menu);
+    this.menu.create();
+  }
+
+  private createGame(): void {
+    this.game = new Game();
+    this.game.create();
+    this.app.stage.addChild(this.game);
+  }
+
+  private destroyMenu(): void {
+    this.menu.destroy();
+  }
 
   private onLoadProgress = (progress: Number): void => {
     console.log("onLoadProgress: " + progress + "%");

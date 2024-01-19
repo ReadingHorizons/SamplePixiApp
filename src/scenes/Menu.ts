@@ -5,7 +5,6 @@ export default class Menu extends DisplayContainer {
   private bg: Sprite;
   private button: Sprite;
   private menu: Sprite;
-  isDestroyed = false;
   constructor() {
     super();
   }
@@ -24,9 +23,7 @@ export default class Menu extends DisplayContainer {
     this.button.cursor = "pointer";
 
     this.button.on("pointerdown", () => {
-      //   this.destroy();
-      console.log("button clicked");
-      this.isDestroyed = true;
+      this.eventDispatcher.dispatchEvent(new CustomEvent("gameStart"));
     });
   }
 
