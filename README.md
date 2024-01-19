@@ -14,8 +14,18 @@ Phase 1 - Menu:
 - When the begin button is clicked, it needs to signal to the controller class (TicTacToe).
 - The controller class will respond to the begin button by destroying the menu and creating an instance of the Game class.
 
-Phase 2 - Game:
+Phase 2 - Game (Design):
 - Create a "Game" class in the scenes directory. It will be similar to the Menu class.
+- Create the game layout as you'd like, but include the following:
+- Display background image for the game.
+- Display and position the grid for the Xs and Os.
+- Display, position, and resize logo if needed.
+
+Phase 3 - Game (Basic Functionality):
+- Display a message for player 1 to go and place an x
+- Capture click and show x
+- Display a message for player 2 to go and place an o
+- Capture click and show o
 
 Extra Credit:
 
