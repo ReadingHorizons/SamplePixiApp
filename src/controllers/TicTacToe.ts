@@ -2,6 +2,7 @@ import { Application, Assets, Container, settings, Sprite } from "pixi.js";
 import AppModel from "../models/AppModel.ts";
 import Menu from "../scenes/Menu.ts";
 import Game from "../scenes/Game.ts";
+import Winner from "../scenes/Winner.ts";
 
 export default class TicTacToe {
   private ASSETS_PATH = "/assets";
@@ -10,6 +11,7 @@ export default class TicTacToe {
   private app: Application | undefined;
   private menu: Menu;
   private game: Game;
+  private winner: Winner;
   private model: AppModel;
 
   constructor(isHD: boolean = false) {
@@ -37,7 +39,6 @@ export default class TicTacToe {
     this.model.app = this.app;
 
     this.preloadAssets().then(() => {
-      //Create the menu
       this.createMenu();
     });
   }
@@ -55,12 +56,41 @@ export default class TicTacToe {
 
   private createGame(): void {
     this.game = new Game();
-    this.game.create();
+    this.game.addEvtListener("gameTie", () => {
+      console.log("game tie");
+      this.destroyGame();
+      this.createGame();
+    });
+    this.game.addEvtListener("gameWinner", (event: CustomEvent) => {
+      console.log("game won", event.detail);
+      this.createWinner();
+    });
     this.app.stage.addChild(this.game);
+    this.game.create();
+  }
+
+  private createWinner(): void {
+    this.winner = new Winner();
+    this.app.stage.addChild(this.winner);
+    this.winner.create();
+    this.winner.addEvtListener("restartGame", () => {
+      console.log("restart game");
+      this.destroyGame();
+      this.destroyWinner();
+      this.createGame();
+    });
   }
 
   private destroyMenu(): void {
     this.menu.destroy();
+  }
+
+  private destroyGame(): void {
+    this.game.destroy();
+  }
+
+  private destroyWinner(): void {
+    this.winner.destroy();
   }
 
   private onLoadProgress = (progress: Number): void => {
@@ -91,8 +121,20 @@ export default class TicTacToe {
               srcs: `${this.ASSETS_PATH}/images/logo_menu@${this._assetResolution}.png`,
             },
             {
-              name: "tac",
-              srcs: `${this.ASSETS_PATH}/images/tac.png`,
+              name: "grid",
+              srcs: `${this.ASSETS_PATH}/images/grid@${this._assetResolution}.png`,
+            },
+            {
+              name: "o",
+              srcs: `${this.ASSETS_PATH}/images/o@${this._assetResolution}.png`,
+            },
+            {
+              name: "x",
+              srcs: `${this.ASSETS_PATH}/images/x@${this._assetResolution}.png`,
+            },
+            {
+              name: "logo_game",
+              srcs: `${this.ASSETS_PATH}/images/logo_game@${this._assetResolution}.png`,
             },
           ],
         },
