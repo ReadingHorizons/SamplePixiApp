@@ -3,18 +3,24 @@ import { Sprite } from "pixi.js";
 
 export default class Game extends DisplayContainer {
   private grid: Sprite;
-  private Mark: Sprite;
+  // private Mark: Sprite;
+  private Mark: { xSprite: Sprite; oSprite: Sprite; quadrant: number };
   private logo_game: Sprite;
-  private board: { quadrant: number; fill: boolean; player: string }[] = [
-    { quadrant: 1, fill: false, player: "" },
-    { quadrant: 2, fill: false, player: "" },
-    { quadrant: 3, fill: false, player: "" },
-    { quadrant: 4, fill: false, player: "" },
-    { quadrant: 5, fill: false, player: "" },
-    { quadrant: 6, fill: false, player: "" },
-    { quadrant: 7, fill: false, player: "" },
-    { quadrant: 8, fill: false, player: "" },
-    { quadrant: 9, fill: false, player: "" },
+  private board: {
+    quadrant: number;
+    fill: boolean;
+    player: string;
+    coordinates: { x: number; y: number };
+  }[] = [
+    { quadrant: 1, fill: false, player: "", coordinates: { x: 375, y: 200 } },
+    { quadrant: 2, fill: false, player: "", coordinates: { x: 650, y: 200 } },
+    { quadrant: 3, fill: false, player: "", coordinates: { x: 950, y: 200 } },
+    { quadrant: 4, fill: false, player: "", coordinates: { x: 375, y: 425 } },
+    { quadrant: 5, fill: false, player: "", coordinates: { x: 650, y: 425 } },
+    { quadrant: 6, fill: false, player: "", coordinates: { x: 950, y: 425 } },
+    { quadrant: 7, fill: false, player: "", coordinates: { x: 375, y: 650 } },
+    { quadrant: 8, fill: false, player: "", coordinates: { x: 650, y: 650 } },
+    { quadrant: 9, fill: false, player: "", coordinates: { x: 950, y: 650 } },
   ];
   private turn: string = "x";
   constructor() {
@@ -24,14 +30,11 @@ export default class Game extends DisplayContainer {
   private createTac() {
     this.grid = Sprite.from("grid");
     this.addChild(this.grid);
-    this.grid.x = 300;
-    this.grid.y = 150;
+    this.grid.anchor.set(0.5);
+    this.grid.x = this.width - 100;
+    this.grid.y = this.height / 2 + 150;
     this.grid.eventMode = "static";
     this.grid.cursor = "pointer";
-    this.grid.on("pointerdown", (e) => {
-      console.log(e.data.global.x, e.data.global.y);
-      this.checkQuadrant(e.data.global.x, e.data.global.y);
-    });
     // check for wins
     this.grid.on("pointerdown", () => {
       if (
@@ -64,7 +67,7 @@ export default class Game extends DisplayContainer {
           this.board[2].fill)
       ) {
         this.eventDispatcher.dispatchEvent(
-          new CustomEvent("gameWinner", { detail: this.board[0].player })
+          new CustomEvent("gameWinner", { detail: this.turn })
         );
         this.grid.removeAllListeners();
         this.grid.cursor = "default";
@@ -84,48 +87,9 @@ export default class Game extends DisplayContainer {
         this.grid.cursor = "default";
       }
     });
-    this.createLogo();
   }
 
-  private;
-
-  private checkQuadrant(x: number, y: number) {
-    switch (true) {
-      case x > 213 && x < 500 && y > 108.5 && y < 312 && !this.board[0].fill:
-        this.createMark(375, 200, 0);
-        break;
-      case x > 510 && x < 740 && y > 108.5 && y < 312 && !this.board[1].fill:
-        this.createMark(650, 200, 1);
-        break;
-      case x > 750 && x < 940 && y > 108.5 && y < 312 && !this.board[2].fill:
-        this.createMark(925, 200, 2);
-        break;
-      case x > 213 && x < 500 && y > 322 && y < 500 && !this.board[3].fill:
-        this.createMark(375, 425, 3);
-        break;
-      case x > 510 && x < 740 && y > 322 && y < 500 && !this.board[4].fill:
-        this.createMark(650, 425, 4);
-        break;
-      case x > 750 && x < 940 && y > 322 && y < 500 && !this.board[5].fill:
-        this.createMark(925, 425, 5);
-        break;
-      case x > 213 && x < 500 && y > 510 && y < 750 && !this.board[6].fill:
-        this.createMark(375, 625, 6);
-        break;
-      case x > 510 && x < 740 && y > 510 && y < 750 && !this.board[7].fill:
-        this.createMark(650, 625, 7);
-        break;
-      case x > 750 && x < 940 && y > 510 && y < 750 && !this.board[8].fill:
-        this.createMark(925, 625, 8);
-        break;
-    }
-  }
-
-  private createMark(xCoord: number, yCoord: number, quadrant: number) {
-    this.Mark = Sprite.from(`${this.turn}`);
-    this.addChild(this.Mark);
-    this.Mark.x = xCoord;
-    this.Mark.y = yCoord;
+  private scoreMark(quadrant: number) {
     this.board[quadrant].fill = true;
     this.board[quadrant].player = this.turn;
     console.log(this.board);
@@ -136,9 +100,39 @@ export default class Game extends DisplayContainer {
     }
   }
 
+  private createMark() {
+    for (let i = 0; i < 9; i++) {
+      this.Mark = {
+        xSprite: Sprite.from("x"),
+        oSprite: Sprite.from("o"),
+        quadrant: i,
+      };
+      this.addChild(this.Mark.xSprite);
+      this.addChild(this.Mark.oSprite);
+      this.Mark.xSprite.x = this.board[i].coordinates.x;
+      this.Mark.xSprite.y = this.board[i].coordinates.y;
+      this.Mark.oSprite.x = this.board[i].coordinates.x;
+      this.Mark.oSprite.y = this.board[i].coordinates.y;
+      this.Mark.xSprite.eventMode = "static";
+      this.Mark.oSprite.eventMode = "static";
+      this.Mark.xSprite.cursor = "pointer";
+      this.Mark.oSprite.cursor = "pointer";
+      this.Mark.xSprite.visible = false;
+      this.Mark.oSprite.visible = false;
+      this.Mark.xSprite.addEventListener("click", () => {
+        this.scoreMark(this.Mark.quadrant);
+        this.Mark.xSprite.visible = true;
+      });
+      this.Mark.oSprite.addEventListener("pointerdown", () => {
+        this.scoreMark(this.Mark.quadrant);
+        this.Mark.oSprite.visible = true;
+      });
+    }
+  }
+
   private createLogo() {
     this.logo_game = Sprite.from("logo_game");
-    this.logo_game.x = 400;
+    this.logo_game.x = this.width / 2;
     this.logo_game.y = 10;
     this.addChild(this.logo_game);
   }
@@ -149,6 +143,8 @@ export default class Game extends DisplayContainer {
   ): void {
     // creates the game
     this.createTac();
+    this.createLogo();
+    this.createMark();
     super.create();
   }
 

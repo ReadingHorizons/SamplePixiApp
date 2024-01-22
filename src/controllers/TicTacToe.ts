@@ -61,10 +61,12 @@ export default class TicTacToe {
       this.destroyGame();
       this.createGame();
     });
+
     this.game.addEvtListener("gameWinner", (event: CustomEvent) => {
       console.log("game won", event.detail);
       this.createWinner();
     });
+
     this.app.stage.addChild(this.game);
     this.game.create();
   }
